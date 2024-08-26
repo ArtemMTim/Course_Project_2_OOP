@@ -40,18 +40,20 @@ class DBCreator:
         cur.execute(
             """CREATE TABLE if not exists companies
                    (company_id SMALLSERIAL PRIMARY KEY,
-                   company_name VARCHAR(25) NOT NULL);"""
+                   company_name text NOT NULL);"""
         )
 
         cur.execute(
             """CREATE TABLE if not exists vacancies
                    (vacancy_id SMALLSERIAL PRIMARY KEY,
-                   company_id INT REFERENCES companies(company_id) NOT NULL,
-                   vacancy_name VARCHAR(25) NOT NULL,
+                   company_id INT NOT NULL,
+                   vacancy_name text NOT NULL,
                     salary INT NOT NULL,
                     link text NOT NULL,
                     description text NOT NULL,
-                    requirement text NOT NULL);"""
+                    requirement text NOT NULL,
+                    FOREIGN KEY (company_id)
+                    REFERENCES companies(company_id));"""
         )
         conn.commit()
         cur.close()
@@ -61,4 +63,4 @@ class DBCreator:
 if __name__ == "__main__":
     db = DBCreator("test_base")
     db.create_db()
-    # db.create_table()
+    db.create_table()

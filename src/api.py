@@ -1,0 +1,100 @@
+import os
+from abc import ABC, abstractmethod
+
+import requests
+
+from user_settings import employers_list
+
+# from config import DATA_DIR
+
+
+class Parser(ABC):
+    """Абстрактный класс по работе с API сервисами."""
+
+    @abstractmethod
+    def load_vacancies(self):
+        pass
+
+    @abstractmethod
+    def export_vac_list(self):
+        pass
+
+
+class HH(Parser):
+    """Класс для работы с API сервиса HeadHunter.
+    Получает список вакансий по ключевому слову.
+    Полученный список приводит к необходимому виду, описанному в README.
+    Класс является дочерним классом класса Parser."""
+
+    def __init__(self):
+        self.url = "https://api.hh.ru/vacancies"
+        self.headers = {"User-Agent": "HH-User-Agent"}
+        self.params = {"text": "", "page": 0, "per_page": 100}
+        self.vacancies = []
+        self.vacancies_for_base = []
+
+    def load_vacancies(self, keyword=" "):
+        """Метод загружает вакансии с сервиса HH. Формирует из загруженных данных список объектов
+        вакансий с полями: название, ссылка, зарплата, описание, требования, место."""
+        self.params["text"] = keyword
+        while self.params.get("page") != 20:
+            response = requests.get(self.url, headers=self.headers, params=self.params)
+            vacancies = response.json()["items"]
+            self.vacancies.extend(vacancies)
+            self.params["page"] += 1
+        for vacancie in self.vacancies:
+            if vacancie["employer"]["name"] in employers_list:
+                employer = vacancie["employer"]["name"]
+                if vacancie["name"]:
+                    title = vacancie["name"]
+                else:
+                    title = "Не указано."
+                if vacancie["alternate_url"]:
+                    link = vacancie["alternate_url"]
+                else:
+                    link = "Не указано."
+                if vacancie["snippet"]["responsibility"]:
+                    description = vacancie["snippet"]["responsibility"]
+                else:
+                    description = "Не указано."
+                if vacancie["snippet"]["requirement"]:
+                    requirement = vacancie["snippet"]["requirement"]
+                else:
+                    requirement = "Не указано."
+
+                if vacancie["salary"]:
+                    if vacancie["salary"]["from"]:
+                        salary = vacancie["salary"]["from"]
+                    elif vacancie["salary"]["to"]:
+                        salary = vacancie["salary"]["to"]
+                    else:
+                        salary = 0
+                else:
+                    salary = 0
+
+                if vacancie["area"]["name"]:
+                    area = vacancie["area"]["name"]
+                else:
+                    area = "Не указано."
+                self.vacancies_for_base.append(
+                    {
+                        "employer": employer,
+                        "title": title,
+                        "link": link,
+                        "description": description,
+                        "requirement": requirement,
+                        "salary": salary,
+                        "area": area,
+                    }
+                )
+
+    def export_vac_list(self):
+        """Метод возвращает обработанный по заданным критериям список вакансий."""
+        return self.vacancies_for_base
+
+
+if __name__ == "__main__":
+    vacs = HH()
+    vacs.load_vacancies()
+    test = vacs.export_vac_list()
+    print(test)
