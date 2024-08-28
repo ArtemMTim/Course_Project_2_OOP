@@ -1,11 +1,6 @@
-import os
 from abc import ABC, abstractmethod
 
 import requests
-
-from user_settings import employers_list
-
-# from config import DATA_DIR
 
 
 class Parser(ABC):
@@ -29,21 +24,21 @@ class HH(Parser):
     def __init__(self):
         self.url = "https://api.hh.ru/vacancies"
         self.headers = {"User-Agent": "HH-User-Agent"}
-        self.params = {"text": "", "page": 0, "per_page": 100}
+        self.params = {"employer_id": "", "area": 113, "page": 0, "per_page": 100}
         self.vacancies = []
         self.vacancies_for_base = []
 
-    def load_vacancies(self, keyword=" "):
+    def load_vacancies(self, id):
         """Метод загружает вакансии с сервиса HH. Формирует из загруженных данных список объектов
         вакансий с полями: название, ссылка, зарплата, описание, требования, место."""
-        self.params["text"] = keyword
+        self.params["employer_id"] = id
         while self.params.get("page") != 20:
             response = requests.get(self.url, headers=self.headers, params=self.params)
             vacancies = response.json()["items"]
             self.vacancies.extend(vacancies)
             self.params["page"] += 1
         for vacancie in self.vacancies:
-            if vacancie["employer"]["name"] in employers_list:
+            if vacancie["employer"]["name"]:
                 employer = vacancie["employer"]["name"]
                 if vacancie["name"]:
                     title = vacancie["name"]
@@ -94,7 +89,11 @@ class HH(Parser):
 
 
 if __name__ == "__main__":
-    vacs = HH()
-    vacs.load_vacancies()
-    test = vacs.export_vac_list()
-    print(test)
+
+    test = []
+    data = (["1057", "Лаборатория Касперского"], ["42", "УРАЛ"])
+    for item in data:
+        vacs = HH()
+        vacs.load_vacancies(item[0])
+        temp = vacs.export_vac_list()
+        test.extend(temp)

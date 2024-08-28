@@ -13,10 +13,12 @@ class DBManager:
             host="localhost", port="5432", database=self.db_name, user="postgres", password="12345"
         )
         cur = conn.cursor()
-        sql = """SELECT company_name, COUNT(*)
-        FROM vacncies
-        GROUP BY company_name"""
-        result = cur.execute(sql)
+        sql = """SELECT company_name, COUNT(*) AS vacancies_count
+                 FROM companies
+                 JOIN vacancies ON companies.company_id = vacancies.company_id
+                 GROUP BY company_name"""
+        cur.execute(sql)
+        result = cur.fetchall()
         cur.close()
         conn.close()
         return result
@@ -26,9 +28,11 @@ class DBManager:
             host="localhost", port="5432", database=self.db_name, user="postgres", password="12345"
         )
         cur = conn.cursor()
-        sql = """SELECT *
-        FROM vacancies"""
-        result = cur.execute(sql)
+        sql = """SELECT company_name, vacancy_name, salary, link 
+                 FROM companies
+                 JOIN vacancies ON companies.company_id = vacancies.company_id"""
+        cur.execute(sql)
+        result = cur.fetchall()
         cur.close()
         conn.close()
         return result
@@ -38,9 +42,10 @@ class DBManager:
             host="localhost", port="5432", database=self.db_name, user="postgres", password="12345"
         )
         cur = conn.cursor()
-        sql = """SELECT AVG(salary)
-        FROM vacancies"""
-        result = cur.execute(sql)
+        sql = """SELECT round(AVG(salary), 2) AS avg_salary
+                 FROM vacancies"""
+        cur.execute(sql)
+        result = cur.fetchall()
         cur.close()
         conn.close()
         return result
