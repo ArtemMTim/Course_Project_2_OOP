@@ -21,7 +21,9 @@ class DBFiller:
                 if cur.fetchone()[0]:
                     cur.execute(f"SELECT company_id FROM companies WHERE company_name = '{item['employer']}'")
                     id = cur.fetchone()[0]
-                    sql_vacs = """INSERT INTO vacancies (company_id, vacancy_name, salary, link, description, requirement) VALUES (%s, %s, %s, %s, %s, %s)"""
+                    sql_vacs = """INSERT INTO vacancies
+                                  (company_id, vacancy_name, salary, link, description, requirement)
+                                  VALUES (%s, %s, %s, %s, %s, %s)"""
                     cur.execute(
                         sql_vacs,
                         (id, item["title"], item["salary"], item["link"], item["description"], item["requirement"]),
@@ -33,7 +35,9 @@ class DBFiller:
                     conn.commit()
                     cur.execute(f"SELECT company_id FROM companies WHERE company_name = '{item['employer']}'")
                     id = cur.fetchone()[0]
-                    sql_vacs = """INSERT INTO vacancies (company_id, vacancy_name, salary, link, description, requirement) VALUES (%s, %s, %s, %s, %s, %s)"""
+                    sql_vacs = """INSERT INTO vacancies
+                                  (company_id, vacancy_name, salary, link, description, requirement)
+                                  VALUES (%s, %s, %s, %s, %s, %s)"""
                     cur.execute(
                         sql_vacs,
                         (id, item["title"], item["salary"], item["link"], item["description"], item["requirement"]),
