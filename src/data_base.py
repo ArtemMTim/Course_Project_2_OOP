@@ -1,19 +1,24 @@
 import psycopg2
+from abc import ABC, abstractmethod
 
 
-class DBCreator:
+class CreatorDB(ABC):
+    @abstractmethod
+    def create_db(self):
+        pass
+
+    @abstractmethod
+    def create_table(self):
+        pass
+
+
+class DBCreator(CreatorDB):
     """Класс по работе с базой данных.
     Класс позволяет создавать базу данных с заданным названием,
-    а также создавать таблицы в сохданной базе данных."""
+    а также создавать таблицы в сохданной базе данных.
+    Класс является дочерним классом класса CreatorDB."""
 
-    # def __init__(self, db_name, db_host, db_port, db_user, db_password):
-    # self.db_name = db_name
-    # self.db_host = db_host
-    # self.db_port = db_port
-    # self.db_user = db_user
-    # self.db_password = db_password
-
-    def __init__(self, db_name):
+    def __init__(self, db_name="test_base"):
         self.db_name = db_name
 
     def create_db(self):
@@ -24,7 +29,6 @@ class DBCreator:
         try:
             sql = f"CREATE DATABASE {self.db_name}"
             cur.execute(sql)
-            print("База данных успешно создана")
         except Exception:
             raise ValueError("Ошибка при создании базы данных.")
         finally:

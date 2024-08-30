@@ -1,9 +1,21 @@
 import psycopg2
+from abc import ABC, abstractmethod
 
 
-class DBManager:
+class ManagerDB(ABC):
+    @abstractmethod
+    def get_all_vacancies(self):
+        pass
+
+    @abstractmethod
+    def get_companies_and_vacancies_count(self):
+        pass
+
+
+class DBManager(ManagerDB):
     """Класс по работе с базой данных.
-    Класс позволяем получать выборку из базы данных по различным признакам."""
+    Класс позволяем получать выборку из базы данных по различным признакам.
+    Класс является дочерним классом класса ManagerDB."""
 
     def __init__(self, db_name):
         self.db_name = db_name
@@ -66,7 +78,7 @@ class DBManager:
                  FROM companies
                  JOIN vacancies ON companies.company_id = vacancies.company_id
                  WHERE salary > (SELECT round(AVG(salary), 2) FROM vacancies)
-                 ORDER BY company_name"""
+                 ORDER BY company_name, salary DESC"""
         cur.execute(sql)
         result = cur.fetchall()
         cur.close()

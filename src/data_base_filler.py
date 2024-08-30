@@ -1,9 +1,17 @@
 import psycopg2
+from abc import ABC, abstractmethod
+
+
+class FillerDB(ABC):
+    @abstractmethod
+    def fill_the_tablet(self):
+        pass
 
 
 class DBFiller:
     """Класс по работе с базой данных.
-    Класс позволяет заполнять данными таблицы базы данных."""
+    Класс позволяет заполнять данными таблицы базы данных.
+    Класс является дочерним классом класса FillerDB."""
 
     def __init__(self, db_name):
         self.db_name = db_name
@@ -17,6 +25,8 @@ class DBFiller:
 
         try:
             for item in data:
+                # Проверяем наличие записи компании в таблице с компаниями, чтобы избежать дублирования.
+                # Получаем id компании и проставляем его в соответствующей графе в таблице вакансий.
                 cur.execute(f"SELECT EXISTS (SELECT * FROM companies WHERE company_name = '{item['employer']}')")
                 if cur.fetchone()[0]:
                     cur.execute(f"SELECT company_id FROM companies WHERE company_name = '{item['employer']}'")
