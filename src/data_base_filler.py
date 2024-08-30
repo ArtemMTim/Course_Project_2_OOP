@@ -1,28 +1,25 @@
 import psycopg2
-from abc import ABC, abstractmethod
+
+from src.abstract_classes import DataBase
 
 
-class FillerDB(ABC):
-    @abstractmethod
-    def fill_the_tablet(self):
-        pass
-
-
-class DBFiller:
+class DBFiller(DataBase):
     """Класс по работе с базой данных.
     Класс позволяет заполнять данными таблицы базы данных.
-    Класс является дочерним классом класса FillerDB."""
+    Класс является дочерним классом класса DataBase."""
 
     def __init__(self, db_name):
         self.db_name = db_name
 
-    def fill_the_tablet(self, data):
-        """Метод заполняет таблицы базы данных."""
-        conn = psycopg2.connect(
+    def db_connect(self):
+        self.conn = psycopg2.connect(
             host="localhost", port="5432", database=self.db_name, user="postgres", password="12345"
         )
-        cur = conn.cursor()
 
+    def fill_the_tablet(self, data):
+        """Метод заполняет таблицы базы данных."""
+        self.db_connect()
+        cur = self.conn.cursor()
         try:
             for item in data:
                 # Проверяем наличие записи компании в таблице с компаниями, чтобы избежать дублирования.
@@ -38,11 +35,11 @@ class DBFiller:
                         sql_vacs,
                         (id, item["title"], item["salary"], item["link"], item["description"], item["requirement"]),
                     )
-                    conn.commit()
+                    self.conn.commit()
 
                 else:
                     cur.execute(f"INSERT INTO companies (company_name) VALUES ('{item['employer']}')")
-                    conn.commit()
+                    self.conn.commit()
                     cur.execute(f"SELECT company_id FROM companies WHERE company_name = '{item['employer']}'")
                     id = cur.fetchone()[0]
                     sql_vacs = """INSERT INTO vacancies
@@ -52,13 +49,13 @@ class DBFiller:
                         sql_vacs,
                         (id, item["title"], item["salary"], item["link"], item["description"], item["requirement"]),
                     )
-                    conn.commit()
+                    self.conn.commit()
 
-                conn.commit()
+                self.conn.commit()
             print("Таблицы компаний и вакансий успешно заполнены.")
 
         except Exception:
             raise ValueError("Ошибка при заполнении базы данных.")
         finally:
             cur.close()
-            conn.close()
+            self.conn.close()

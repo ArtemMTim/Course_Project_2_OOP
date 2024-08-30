@@ -1,15 +1,6 @@
 import psycopg2
-from abc import ABC, abstractmethod
 
-
-class CreatorDB(ABC):
-    @abstractmethod
-    def create_db(self):
-        pass
-
-    @abstractmethod
-    def create_table(self):
-        pass
+from src.abstract_classes import CreatorDB
 
 
 class DBCreator(CreatorDB):
