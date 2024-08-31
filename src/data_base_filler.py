@@ -8,15 +8,15 @@ class DBFiller(DataBase):
     Класс позволяет заполнять данными таблицы базы данных.
     Класс является дочерним классом класса DataBase."""
 
-    def __init__(self, db_name):
+    def __init__(self, db_name: str) -> None:
         self.db_name = db_name
 
-    def db_connect(self):
+    def db_connect(self) -> None:
         self.conn = psycopg2.connect(
             host="localhost", port="5432", database=self.db_name, user="postgres", password="12345"
         )
 
-    def fill_the_tablet(self, data):
+    def fill_the_tablet(self, data: list) -> None:
         """Метод заполняет таблицы базы данных."""
         self.db_connect()
         cur = self.conn.cursor()

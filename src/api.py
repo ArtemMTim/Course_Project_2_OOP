@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any, List
 
 import requests
 
@@ -7,11 +8,11 @@ class Parser(ABC):
     """Абстрактный класс по работе с API сервисами."""
 
     @abstractmethod
-    def load_vacancies(self):
+    def load_vacancies(self) -> None:
         pass
 
     @abstractmethod
-    def export_vac_list(self):
+    def export_vac_list(self) -> List[Any]:
         pass
 
 
@@ -21,14 +22,14 @@ class HH(Parser):
     Полученный список приводит к необходимому виду, описанному в README.
     Класс является дочерним классом класса Parser."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.url = "https://api.hh.ru/vacancies"
         self.headers = {"User-Agent": "HH-User-Agent"}
         self.params = {"employer_id": "", "area": 113, "page": 0, "per_page": 100}
         self.vacancies = []
         self.vacancies_for_base = []
 
-    def load_vacancies(self, id):
+    def load_vacancies(self, id: list[Any]) -> None:
         """Метод загружает вакансии с сервиса HH. Формирует из загруженных данных список объектов
         вакансий с полями: название, ссылка, зарплата, описание, требования, место."""
         self.params["employer_id"] = id
@@ -83,17 +84,6 @@ class HH(Parser):
                     }
                 )
 
-    def export_vac_list(self):
+    def export_vac_list(self) -> list:
         """Метод возвращает обработанный по заданным критериям список вакансий."""
         return self.vacancies_for_base
-
-
-if __name__ == "__main__":
-
-    test = []
-    data = (["1057", "Лаборатория Касперского"], ["42", "УРАЛ"])
-    for item in data:
-        vacs = HH()
-        vacs.load_vacancies(item[0])
-        temp = vacs.export_vac_list()
-        test.extend(temp)

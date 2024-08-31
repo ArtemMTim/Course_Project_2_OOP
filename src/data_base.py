@@ -9,10 +9,10 @@ class DBCreator(CreatorDB):
     а также создавать таблицы в сохданной базе данных.
     Класс является дочерним классом класса CreatorDB."""
 
-    def __init__(self, db_name="test_base"):
+    def __init__(self, db_name: str = "test_base") -> None:
         self.db_name = db_name
 
-    def create_db(self):
+    def create_db(self) -> None:
         """Метод создаёт базу данных с заданным названием."""
         conn = psycopg2.connect(host="localhost", port="5432", database="postgres", user="postgres", password="12345")
         cur = conn.cursor()
@@ -26,36 +26,34 @@ class DBCreator(CreatorDB):
             cur.close()
             conn.close()
 
-    def create_table(self):
+    def create_table(self) -> None:
         """Метод создаёт таблицы с заданными названиями."""
         conn = psycopg2.connect(
             host="localhost", port="5432", database=self.db_name, user="postgres", password="12345"
         )
         cur = conn.cursor()
-        cur.execute(
-            """CREATE TABLE if not exists companies
-                   (company_id SMALLSERIAL PRIMARY KEY,
-                   company_name text NOT NULL);"""
-        )
+        try:
+            cur.execute(
+                """CREATE TABLE if not exists companies
+                       (company_id SMALLSERIAL PRIMARY KEY,
+                       company_name text NOT NULL);"""
+            )
 
-        cur.execute(
-            """CREATE TABLE if not exists vacancies
-                   (vacancy_id SMALLSERIAL PRIMARY KEY,
-                   company_id INT NOT NULL,
-                   vacancy_name text NOT NULL,
-                    salary INT NOT NULL,
-                    link text NOT NULL,
-                    description text NOT NULL,
-                    requirement text NOT NULL,
-                    FOREIGN KEY (company_id)
-                    REFERENCES companies(company_id));"""
-        )
-        conn.commit()
-        cur.close()
-        conn.close()
-
-
-if __name__ == "__main__":
-    db = DBCreator("test_base")
-    db.create_db()
-    db.create_table()
+            cur.execute(
+                """CREATE TABLE if not exists vacancies
+                        (vacancy_id SMALLSERIAL PRIMARY KEY,
+                        company_id INT NOT NULL,
+                        vacancy_name text NOT NULL,
+                        salary INT NOT NULL,
+                        link text NOT NULL,
+                        description text NOT NULL,
+                        requirement text NOT NULL,
+                        FOREIGN KEY (company_id)
+                        REFERENCES companies(company_id));"""
+            )
+            conn.commit()
+        except Exception:
+            raise ValueError("Ошибка при создании таблиц базы данных.")
+        finally:
+            cur.close()
+            conn.close()

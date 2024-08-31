@@ -8,15 +8,15 @@ class DBManager(DataBase):
     Класс позволяем получать выборку из базы данных по различным признакам.
     Класс является дочерним классом класса DataBase."""
 
-    def __init__(self, db_name):
+    def __init__(self, db_name: str) -> None:
         self.db_name = db_name
 
-    def db_connect(self):
+    def db_connect(self) -> None:
         self.conn = psycopg2.connect(
             host="localhost", port="5432", database=self.db_name, user="postgres", password="12345"
         )
 
-    def get_companies_and_vacancies_count(self):
+    def get_companies_and_vacancies_count(self) -> list[tuple]:
         """Метод возвращает выборку по вакансиям.
         В выборке присутствуют столбцы: название компании, количество вакансий указанной компании."""
         self.db_connect()
@@ -31,7 +31,7 @@ class DBManager(DataBase):
         self.conn.close()
         return result
 
-    def get_all_vacancies(self):
+    def get_all_vacancies(self) -> list[tuple]:
         """Метод возвращает выборку по всем вакансиям.
         В выборке присутствуют столбцы: название компании, название вакансии, зарплата, сылка на вакансию."""
         self.db_connect()
@@ -45,7 +45,7 @@ class DBManager(DataBase):
         self.conn.close()
         return result
 
-    def get_avg_salary(self):
+    def get_avg_salary(self) -> list[tuple]:
         """Метод возвращает среднюю зарплату по вакансиям."""
         self.db_connect()
         cur = self.conn.cursor()
@@ -57,7 +57,7 @@ class DBManager(DataBase):
         self.conn.close()
         return result
 
-    def get_vacancies_with_higher_salary(self):
+    def get_vacancies_with_higher_salary(self) -> list[tuple]:
         """Метод возвращает выборку по вакансиям, у которых зарплата выше средней по вакансиям.
         В выборке присутствуют столбцы: название компании, название вакансии, зарплата, сылка на вакансию."""
         self.db_connect()
@@ -73,7 +73,7 @@ class DBManager(DataBase):
         self.conn.close()
         return result
 
-    def get_vacancies_with_keyword(self, keyword):
+    def get_vacancies_with_keyword(self, keyword: str) -> list[tuple]:
         """Метод возвращает выборку по вакансиям, у которых присутствует ключевое слово в названии.
         В выборке присутствуют столбцы: название компании, название вакансии, зарплата, сылка на вакансию."""
         self.db_connect()
@@ -87,8 +87,3 @@ class DBManager(DataBase):
         cur.close()
         self.conn.close()
         return result
-
-
-if __name__ == "__main__":
-    db_manager = DBManager("test_base")
-    print(db_manager.get_vacancies_with_keyword("тестир"))
