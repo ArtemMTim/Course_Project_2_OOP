@@ -50,9 +50,14 @@ def main_func():
     if user_choice == '5':
         user_keyword = input('''Вы выбрали выборку вакансий по ключевому слову.
         Введите ключевое слово сюда: ''')
-        print(db_manager.get_vacancies_with_keyword(user_keyword))
+        result_temp = db_manager.get_vacancies_with_keyword(user_keyword)
     else:
-        print(db_manager_dict[user_choice])
+        result_temp = db_manager_dict[user_choice]
+    result = []
+    for item in result_temp:
+        result.append(tuple([str(c) for c in item]))
+    for item in result:
+        print(' <-> '.join(item))
 
 
 if __name__ == '__main__':
