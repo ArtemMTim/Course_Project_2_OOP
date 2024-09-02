@@ -15,6 +15,7 @@ class DBFiller(DataBase):
         self.db_name = db_name
 
     def db_connect(self) -> None:
+        """Метод выполняет подключение к базе данных с заданным названием."""
         load_dotenv()
         db_host = os.getenv("DB_HOST")
         db_port = os.getenv("DB_PORT")
