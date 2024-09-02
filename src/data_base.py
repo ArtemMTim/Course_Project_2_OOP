@@ -1,4 +1,7 @@
+import os
+
 import psycopg2
+from dotenv import load_dotenv
 
 from src.abstract_classes import CreatorDB
 
@@ -14,7 +17,13 @@ class DBCreator(CreatorDB):
 
     def create_db(self) -> None:
         """Метод создаёт базу данных с заданным названием."""
-        conn = psycopg2.connect(host="localhost", port="5432", database="postgres", user="postgres", password="12345")
+        load_dotenv()
+        db_host = os.getenv("DB_HOST")
+        db_port = os.getenv("DB_PORT")
+        db_user = os.getenv("DB_USER")
+        db_password = os.getenv("DB_PASSWORD")
+        db_database = os.getenv("DB_DATABASE")
+        conn = psycopg2.connect(host=db_host, port=db_port, database=db_database, user=db_user, password=db_password)
         cur = conn.cursor()
         conn.autocommit = True
         try:
@@ -28,9 +37,12 @@ class DBCreator(CreatorDB):
 
     def create_table(self) -> None:
         """Метод создаёт таблицы с заданными названиями."""
-        conn = psycopg2.connect(
-            host="localhost", port="5432", database=self.db_name, user="postgres", password="12345"
-        )
+        load_dotenv()
+        db_host = os.getenv("DB_HOST")
+        db_port = os.getenv("DB_PORT")
+        db_user = os.getenv("DB_USER")
+        db_password = os.getenv("DB_PASSWORD")
+        conn = psycopg2.connect(host=db_host, port=db_port, database=self.db_name, user=db_user, password=db_password)
         cur = conn.cursor()
         try:
             cur.execute(

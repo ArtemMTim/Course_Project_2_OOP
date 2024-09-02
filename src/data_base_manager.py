@@ -1,4 +1,7 @@
+import os
+
 import psycopg2
+from dotenv import load_dotenv
 
 from src.abstract_classes import DataBase
 
@@ -12,8 +15,14 @@ class DBManager(DataBase):
         self.db_name = db_name
 
     def db_connect(self) -> None:
+        load_dotenv()
+        db_host = os.getenv("DB_HOST")
+        db_port = os.getenv("DB_PORT")
+        db_user = os.getenv("DB_USER")
+        db_password = os.getenv("DB_PASSWORD")
+
         self.conn = psycopg2.connect(
-            host="localhost", port="5432", database=self.db_name, user="postgres", password="12345"
+            host=db_host, port=db_port, database=self.db_name, user=db_user, password=db_password
         )
 
     def get_companies_and_vacancies_count(self) -> list[tuple]:
