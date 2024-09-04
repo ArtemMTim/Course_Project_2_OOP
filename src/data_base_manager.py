@@ -1,8 +1,6 @@
-import os
-
 import psycopg2
-from dotenv import load_dotenv
 
+from config import config
 from src.abstract_classes import DataBase
 
 
@@ -13,18 +11,11 @@ class DBManager(DataBase):
 
     def __init__(self, db_name: str) -> None:
         self.db_name = db_name
+        self.params = config()
 
     def db_connect(self) -> None:
         """Метод выполняет подключение к базе данных с заданным названием."""
-        load_dotenv()
-        db_host = os.getenv("DB_HOST")
-        db_port = os.getenv("DB_PORT")
-        db_user = os.getenv("DB_USER")
-        db_password = os.getenv("DB_PASSWORD")
-
-        self.conn = psycopg2.connect(
-            host=db_host, port=db_port, database=self.db_name, user=db_user, password=db_password
-        )
+        self.conn = psycopg2.connect(database=self.db_name, **self.params)
 
     def get_companies_and_vacancies_count(self) -> list[tuple]:
         """Метод возвращает выборку по вакансиям.
